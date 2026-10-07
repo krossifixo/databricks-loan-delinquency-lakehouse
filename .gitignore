@@ -5,3 +5,6 @@ __pycache__/
 .env
 .env.local
 .DS_Store
+
+.databricks/
+app/.databricks/
