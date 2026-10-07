@@ -35,3 +35,19 @@ Per the submission rules, this repo commits **text** evidence that the build ran
 
 ## Environment
 Built on Databricks (serverless), Unity Catalog catalog `serverless_stable_fslt65_catalog`, schema `loan_delinquency`. All data is synthetic; no real customer data is present.
+
+## Submission summary (all six stages run end-to-end)
+
+| Stage | Artifact | Evidence (text) |
+|---|---|---|
+| Lakeflow ingest | `pipelines/loan_delinquency_pipeline.sql` | `evidence/02_lakeflow_pipeline_run.txt` |
+| Unity Catalog govern | `sql/03_governance.sql` | `evidence/03_unity_catalog_governance.txt` |
+| ML + GenAI | `ml/train_model.py` | `evidence/04_ml_genai.txt` (AUC 0.74, lift 3.7x, UC-registered model) |
+| Lakebase serving | `lakebase/sync_to_lakebase.py`, `lakebase/synced_table_spec.json` | `evidence/05_lakebase_serving.txt`, `evidence/05b_lakebase_synced_table.txt` |
+| Genie NL querying | `genie/space_config.json` | `evidence/06_genie_transcripts.txt` |
+| Databricks App | `app/app.py` | `evidence/07_databricks_app.txt` |
+
+- **App:** https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
+- **Genie space:** Loan Delinquency Risk — Collections Genie (`01f1c272286c1c379ae5aa850af96c97`)
+- **Deck:** `deck/collections_cockpit_deck.pdf` (+ editable Google Slides linked in `deck/README.md`)
+- All data synthetic; no real customer data.
