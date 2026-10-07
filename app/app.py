@@ -106,9 +106,16 @@ except Exception as e:
 
 st.link_button("Open the full Genie space", f"https://{HOST}/genie/rooms/{GENIE_SPACE}")
 
-# --- In-app Genie chatbot ---
-st.subheader("Ask Genie (in-app)")
-st.caption("Ask about loans, delinquency drivers, or open cases in plain English — powered by the Genie space, no need to leave the app.")
+# --- Floating in-app Genie chatbot (pinned bottom-right, does not reflow the page) ---
+st.markdown("""
+<style>
+/* pin the Genie popover trigger to the bottom-right corner */
+div[data-testid="stPopover"] { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+/* size + scroll the popover panel so chat stays in its own box */
+div[data-testid="stPopoverBody"] { width: 430px; max-width: 92vw; max-height: 72vh; overflow-y: auto; }
+</style>
+""", unsafe_allow_html=True)
+
 if "genie_hist" not in st.session_state:
     st.session_state.genie_hist = []
 SAMPLES = [
@@ -117,27 +124,37 @@ SAMPLES = [
     "How many open collection cases are there, grouped by assigned_to?",
     "List the top 5 loans by risk score.",
 ]
-scols = st.columns(len(SAMPLES))
-clicked = None
-for i, s in enumerate(SAMPLES):
-    if scols[i].button(s, key=f"gq{i}"):
-        clicked = s
-for role, content, sql, df in st.session_state.genie_hist:
-    with st.chat_message(role):
-        st.markdown(content)
-        if sql:
-            with st.expander("SQL Genie ran"):
-                st.code(sql, language="sql")
-        if df is not None and len(df):
-            st.dataframe(df, use_container_width=True, hide_index=True)
-typed = st.chat_input("Ask Genie a question about the portfolio...")
-prompt = typed or clicked
-if prompt:
-    st.session_state.genie_hist.append(("user", prompt, None, None))
-    with st.spinner("Genie is thinking..."):
-        text, sql, df = genie_ask(prompt)
-    st.session_state.genie_hist.append(("assistant", text, sql, df))
-    st.rerun()
+
+with st.popover("💬 Ask Genie", use_container_width=False):
+    st.caption("Ask about loans, delinquency drivers, or open cases — powered by the Genie space.")
+    bcols = st.columns(2)
+    pending = None
+    for i, s in enumerate(SAMPLES):
+        if bcols[i % 2].button(s, key=f"gq{i}"):
+            pending = s
+    with st.form("genie_form", clear_on_submit=True):
+        typed = st.text_input("Ask Genie", label_visibility="collapsed",
+                              placeholder="Ask a question about the portfolio...")
+        if st.form_submit_button("Send") and typed:
+            pending = typed
+    if st.button("Clear chat", key="genie_clear"):
+        st.session_state.genie_hist = []
+        st.session_state.pop("genie_conv", None)
+    # process synchronously (no st.rerun) so the panel stays open and shows the answer
+    if pending:
+        st.session_state.genie_hist.append(("user", pending, None, None))
+        with st.spinner("Genie is thinking..."):
+            text, sql, df = genie_ask(pending)
+        st.session_state.genie_hist.append(("assistant", text, sql, df))
+    # render the conversation inside the popover
+    for role, content, sql, df in st.session_state.genie_hist:
+        with st.chat_message(role):
+            st.markdown(content)
+            if sql:
+                with st.expander("SQL Genie ran"):
+                    st.code(sql, language="sql")
+            if df is not None and len(df):
+                st.dataframe(df, use_container_width=True, hide_index=True)
 
 # --- At-risk queue ---
 st.subheader("At-risk queue")
