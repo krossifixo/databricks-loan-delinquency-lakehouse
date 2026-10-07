@@ -1,0 +1,22 @@
+UNITY CATALOG GOVERNANCE — EVIDENCE
+============================================================
+## Governed objects in schema (type + comment)
+table_name | table_type | comment
+delinquency_training | MATERIALIZED_VIEW | ML training/scoring set: current loans + next-month 30+DPD label and risk features
+loans_bronze | STREAMING_TABLE | Raw loan origination master, auto-ingested from the UC Volume landing zone
+loans_silver | MATERIALIZED_VIEW | Cleaned, typed loan master
+payments_bronze | STREAMING_TABLE | Raw monthly payment-history snapshots, auto-ingested from the landing zone
+payments_silver | MATERIALIZED_VIEW | Cleaned, typed monthly payment snapshots
+
+## Schema tag (governed tag policy enforced: domain in [finance,sales,supply_chain,quality,hr,operations])
+catalog_name | schema_name | tag_name | tag_value
+serverless_stable_fslt65_catalog | loan_delinquency | domain | finance
+
+## Table tags on the ML gold table
+table_name | tag_name | tag_value
+delinquency_training | layer | gold
+delinquency_training | contains_label | true
+
+## Data-quality expectations enforced by the Lakeflow pipeline (governance via DQ)
+data_quality_controls
+expectations defined in pipeline: valid_loan_id, valid_principal, valid_dti, valid_dpd, valid_month, has_label

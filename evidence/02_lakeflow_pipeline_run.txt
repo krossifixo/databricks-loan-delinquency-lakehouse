@@ -1,0 +1,37 @@
+LAKEFLOW PIPELINE RUN — EVIDENCE
+pipeline_id: 5720209f-9188-44fc-9ac4-7e4b0fd95c53  update: 1c74fa2b-578c-4b75-bd03-06b0238a7723  state: COMPLETED
+============================================================
+
+## Table row counts (bronze -> silver -> training)
+tbl | rows
+delinquency_training | 51573
+loans_bronze | 5000
+loans_silver | 5000
+payments_bronze | 60000
+payments_silver | 60000
+
+## ML label distribution (target_delinquent_next)
+target_delinquent_next | n | pct
+0 | 49933 | 96.82
+1 | 1640 | 3.18
+
+## Delinquency rate by FICO band (sanity: monotonic signal)
+fico_band | roll_rate | n
+580-619 | 0.0632 | 4033
+620-659 | 0.0451 | 7763
+660-699 | 0.0258 | 9575
+700-739 | 0.0167 | 9462
+740-779 | 0.0082 | 8752
+780+ | 0.0052 | 7341
+<580 | 0.1119 | 4647
+
+## Sample of training rows
+loan_id | as_of_month | fico_band | payment_burden | dti | prior_missed_3m | target_delinquent_next
+LN000001 | 2025-06-30 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-05-31 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-04-01 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-03-02 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-01-31 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-05-01 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-01-01 | 700-739 | 0.06 | 0.343 | 0 | 0
+LN000001 | 2025-07-30 | 700-739 | 0.06 | 0.343 | 0 | 0
