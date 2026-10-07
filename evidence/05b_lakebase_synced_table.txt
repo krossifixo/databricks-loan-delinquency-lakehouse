@@ -1,0 +1,16 @@
+LAKEBASE NATIVE UC SYNCED TABLE — EVIDENCE
+UC name: loan_delinquency_pg.serving.loan_risk_scored_synced
+source : serverless_stable_fslt65_catalog.loan_delinquency.loan_risk_scored (Delta)
+policy : SNAPSHOT  state: SYNCED_TABLE_ONLINE_NO_PENDING_UPDATE
+============================================================
+rows in synced table: 5000
+
+tier | loans
+Low | 4004
+Medium | 843
+High | 153
+
+top 3 by risk_score:
+LN004555 | High | 0.9378
+LN002731 | High | 0.8660
+LN004702 | High | 0.7209

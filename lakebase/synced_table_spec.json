@@ -1,0 +1,11 @@
+{
+  "name": "loan_delinquency_pg.serving.loan_risk_scored_synced",
+  "database_instance_name": "loan-delinquency-db",
+  "logical_database_name": "databricks_postgres",
+  "spec": {
+    "source_table_full_name": "serverless_stable_fslt65_catalog.loan_delinquency.loan_risk_scored",
+    "primary_key_columns": ["loan_id"],
+    "scheduling_policy": "SNAPSHOT",
+    "create_database_objects_if_missing": true
+  }
+}
