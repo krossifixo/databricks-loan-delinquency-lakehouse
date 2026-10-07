@@ -1,0 +1,19 @@
+DATABRICKS APP — EVIDENCE
+============================================================
+App: loan-collections-cockpit (Streamlit)
+URL: https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
+Deploy state: SUCCEEDED — 'App started successfully'
+SP: a2c59ebf-343f-424b-9604-0f15a8e1ec33 (granted USE CATALOG/SCHEMA + SELECT + MODIFY on cases; warehouse CAN_USE)
+
+## What the app surfaces (reads the governed/served tables via the warehouse):
+ - KPIs: loans scored, high-risk count, high-risk exposure, avg risk score
+ - AI briefing (at_risk_summary, GenAI)
+ - At-risk queue (loan_risk_scored, filter by tier)
+ - Open-case write-back -> app_collection_cases
+ - Genie link (space 01f1c272286c1c379ae5aa850af96c97)
+
+## Underlying data the app serves (verified via warehouse):
+risk_tier | loans | exposure
+Low | 4004 | 1.06754816E8
+Medium | 843 | 2.3459266E7
+High | 153 | 4393757.0
