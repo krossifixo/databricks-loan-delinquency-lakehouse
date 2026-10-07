@@ -86,3 +86,64 @@ See `evidence/08_app_smoketest.txt`. It runs the app's exact queries: KPIs, the 
 
 ## 8. Evidence index (readable as text, in `evidence/`)
 `01` data generation + profile · `02` Lakeflow run · `03` UC governance · `04` ML + GenAI · `05`/`05b` Lakebase serving · `06` Genie transcripts · `07` app deploy · `08` app smoke test.
+
+---
+
+## 9. Live demo script (customer-facing)
+
+Total time: ~15 minutes. Tell a story from raw data to a business decision. Keep the **app** as the hero; show the plumbing briefly so they trust it, then spend the most time on the app and Genie.
+
+### Pre-demo checklist (do 5 minutes before)
+1. Log in to the workspace `fevm-serverless-stable-fslt65`.
+2. **Warm the warehouse:** open a SQL editor and run `SELECT 1` on warehouse `dd8909b1ec28c7ce` (serverless cold-start is a few seconds; do it now so nothing stalls on stage).
+3. **Open the app** in a tab: https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com (first load wakes it; leave it open).
+4. **Open the Genie space** in another tab (Loan Delinquency Risk — Collections Genie).
+5. Have the Lakeflow pipeline page and the Catalog page for `serverless_stable_fslt65_catalog.loan_delinquency` open in tabs.
+6. (Optional) re-run the smoke test (`evidence/08`) so you know the write-back works.
+
+### The flow
+1. **Set the scene (1 min, no screen).** "You lose money when loans that are current today quietly roll into 30+ days past due and then charge off, and collections only finds out after the fact. We built a system that predicts the roll one cycle early so your team can act first. Everything you'll see is one Databricks platform, and all data here is synthetic."
+
+2. **Raw data + Lakeflow ingest (2 min).** Show the Catalog: the raw CSVs landed in a Volume, then the Lakeflow pipeline turned them into clean, trustworthy tables. Open the pipeline graph: "bronze is the raw copy, silver is cleaned and validated — these red/green checks are data-quality rules that drop bad rows automatically — and this gold `delinquency_training` table is model-ready, 51,573 labeled examples." Point out it ran in about a minute.
+
+3. **Unity Catalog governance (1 min).** On a table, show the Lineage tab (raw -> bronze -> silver -> training), the comments, the tag (`domain = finance`), and that access is a single grant. "One place governs who can see what, with full lineage for audit."
+
+4. **The model (1.5 min).** Show the registered model in the Catalog (Models) and its metrics. Talk track: "It scores every current loan for the chance it rolls next month. The number that matters to collections is **lift: the model's top 5% is 3.7x more likely to actually roll than average** — so the same number of calls catches far more real problems."
+
+5. **The app — spend the most time here (5 min).** Switch to the app.
+   - **KPIs** up top: 5,000 loans scored, 153 high-risk, $4.4M exposure.
+   - **AI briefing:** read the GenAI summary aloud — "the system writes this plain-language brief and a recommended action every run."
+   - **At-risk queue:** filter to High, sort by risk score. "This is the collections to-do list, worst dollars first."
+   - **Open a case:** pick the top loan, assign to a team, click Open case. Scroll to **Recent cases** to show it persisted. "That action is written back operationally in real time."
+
+6. **Genie — let them drive (2 min).** In the Genie tab, type a plain-English question, e.g. "Which FICO band has the highest delinquency rate?" or "Show the top 5 highest-risk loans." Show that it writes the SQL and returns governed results. "Your risk and collections leads can ask their own questions, no SQL, no analyst in the loop."
+
+7. **Lakebase (30 sec, optional).** "The scored queue is also served from Lakebase, Databricks' operational database, so an app can read it in milliseconds — that's what makes the cockpit feel instant."
+
+8. **Close (1 min).** "From a raw file to a decision in one governed platform: ingest, govern, predict, serve, ask, and act. Next step is to validate this on a scrubbed slice of your real book and measure the roll-rate improvement." Hand to the KPIs on the deck.
+
+### If something is slow
+- Warehouse/Lakebase cold start: keep talking; it resolves in seconds. The pre-demo warm-up avoids this.
+- App won't load: fall back to the Genie tab and the Catalog, and show `evidence/` query results — the story still lands.
+
+---
+
+## 10. What each Databricks service does (beginner-friendly)
+
+Plain-language explanation of every piece used, no jargon.
+
+- **Delta tables** — the storage format for all tables here. Think of it as a spreadsheet that is reliable at huge scale: it tracks versions, handles updates safely, and is fast to query.
+- **Unity Catalog** — the catalog and security guard for all data and AI. It is the single place that lists every table, model, and file, controls who can access each one, and records lineage (what came from what). Analogy: the library catalog plus the librarian who checks your card.
+- **Volumes** — governed folders for files (like the raw CSVs) inside Unity Catalog, so even loose files are governed and discoverable.
+- **Lakeflow (Declarative Pipelines)** — the assembly line that takes raw data and turns it into clean, trustworthy tables, step by step, with built-in quality checks. You declare what the result should look like and it figures out how to build and refresh it.
+- **Bronze / Silver / Gold** — the three quality stages on that assembly line: bronze = raw copy as-landed, silver = cleaned and validated, gold = business/model-ready. (These are a naming convention, not separate products.)
+- **Expectations** — the quality checks inside Lakeflow (for example "balance must be >= 0"). Rows that fail can be dropped or flagged, so bad data does not silently poison results.
+- **SQL warehouse** — the engine that runs SQL queries. "Serverless" means it starts on demand and you do not manage any servers; it just runs your query and scales itself.
+- **MLflow** — the system that trains, tracks, and versions machine-learning models. It records each model's accuracy metrics and stores the model so it can be reused and governed like any other asset.
+- **Model (registered in Unity Catalog)** — the trained predictor itself, catalogued and versioned next to the data, so it is governed and auditable, not a loose file on someone's laptop.
+- **GenAI / `ai_query` (Foundation Model APIs)** — a built-in call to a large language model from SQL. Here it reads the day's risk numbers and writes a short, plain-English briefing with a recommended action — the "AI analyst" that explains the queue.
+- **Lakebase** — Databricks' operational (transactional) database, Postgres under the hood. It serves data to apps with millisecond latency, so a live application can read the scored queue instantly and write back actions like opening a case.
+- **Synced table** — an automatic, governed copy of a Unity Catalog table kept up to date inside Lakebase, so the app gets fast operational reads without anyone writing a custom copy job.
+- **Genie** — the natural-language interface to your governed data. A business user types a question in plain English and Genie writes the SQL and returns the answer, using only the tables and permissions Unity Catalog allows.
+- **Databricks App** — a web application that runs directly on Databricks (no separate hosting). Here it is the "collections cockpit" that shows the ranked at-risk queue, the AI briefing, a Genie link, and the open-a-case button — the business-facing front door to everything above.
+- **Service principal** — the app's own identity. The app signs in as this non-human account to read and write data under controlled, least-privilege permissions, rather than borrowing a person's login.
