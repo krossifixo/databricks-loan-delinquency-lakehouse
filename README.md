@@ -11,10 +11,10 @@
 |---|---|---|
 | 1. Ingest | **Lakeflow** | Load raw synthetic loan + payment CSVs from a UC Volume into bronze, then clean to silver with expectations. |
 | 2. Govern | **Unity Catalog** | Catalog/schema, table + column comments, PK/FK constraints, tags, grants, lineage. |
-| 3. Serve | **Lakebase** | Sync scored at-risk loans / collection cases to Postgres for low-latency operational serving to the app. |
+| 3. Serve | **Lakebase** | Serve the scored at-risk queue (UC synced table), the GenAI briefing, and the operational collection_cases write-back from serverless Postgres; all three tables are also registered in Unity Catalog so they are queryable from Databricks. |
 | 4. Intelligence | **ML + GenAI** | Train an MLflow delinquency-risk model; a GenAI summary explains the daily at-risk queue in plain language. |
-| 5. Natural language | **Genie** | A governed Genie space so risk/collections leads can ask questions in English. |
-| 6. Business surface | **Databricks App** | A collections cockpit: ranked at-risk loans, risk drivers, Genie Q&A, and case actions. |
+| 5. Natural language | **Genie** | A governed Genie space (loans, scored queue, and the operational collection_cases table) so risk/collections leads can ask questions in English. |
+| 6. Business surface | **Databricks App** | A Lakebase-native collections cockpit: ranked at-risk loans, AI briefing, an embedded Genie assistant, and case actions written back to Lakebase. |
 
 ## Repository layout
 
@@ -28,6 +28,7 @@ genie/       Genie space definition + example question/SQL/result transcripts
 app/         Databricks App (collections cockpit)
 evidence/    READABLE-AS-TEXT execution evidence (run logs, query results, metrics)
 deck/        business presentation (outcome-led, KPI-quantified)
+RUNBOOK.md   operational runbook: service glossary, architecture, demo script, recreate steps
 ```
 
 ## Execution evidence

@@ -10,10 +10,14 @@ SP: a2c59ebf-343f-424b-9604-0f15a8e1ec33
  - Reads at-risk queue: serving.loan_risk_scored_synced (UC synced table)
  - Reads GenAI briefing: public.at_risk_summary
  - Writes case actions: public.collection_cases (INSERT)
- - Genie link for NL questions
+ - Embedded Genie assistant: a floating bottom-right "Ask Genie" widget talks to the Genie
+   space via the Conversation API (start-conversation -> poll message -> fetch query-result),
+   so a collections user asks in plain English without leaving the cockpit. The link to the
+   full Genie space is also kept.
 
 ## Verified data path (app's exact queries, run against Lakebase)
 KPIs: 5000 loans, 153 High, $4,393,757 exposure
 queue top2: LN004555 (0.9378), LN002731 (0.8660)
-write-back: INSERT into collection_cases succeeded and read back
-SP grants: SELECT on synced queue + briefing; INSERT,SELECT on collection_cases
+write-back: INSERT into collection_cases succeeded and read back (2 cases now persisted in Lakebase)
+embedded Genie: in-app question -> generated SQL -> result returned (verified against the live space)
+SP grants: SELECT on synced queue + briefing; INSERT,SELECT on collection_cases + USAGE,SELECT on its serial sequence

@@ -1,6 +1,6 @@
 GENIE — NATURAL-LANGUAGE QUERY TRANSCRIPTS (EVIDENCE)
 space: Loan Delinquency Risk — Collections Genie (01f1c272286c1c379ae5aa850af96c97)
-tables: delinquency_training, loan_risk_scored, loans_silver
+tables: delinquency_training, loan_risk_scored, loans_silver, loan_delinquency_pg.public.collection_cases
 ============================================================
 
 QUESTION: Which FICO band has the highest average target_delinquent_next in delinquency_training? Return fico_band and the rate.
@@ -81,3 +81,25 @@ The total outstanding balance for **High** risk tier loans in `loan_risk_scored`
 | --- |
 | 4393756.61 |
 
+
+QUESTION: How many open collection cases are there, grouped by assigned_to?  (operational table, live-queried in Lakebase via its UC registration)
+----------------------------------------
+
+SQL executed:
+  SELECT `assigned_to`, COUNT(*) AS `open_case_count`
+  FROM `loan_delinquency_pg`.`public`.`collection_cases`
+  WHERE `status` IS NOT NULL
+    AND `assigned_to` IS NOT NULL
+    AND `status` ILIKE '%open%'
+  GROUP BY `assigned_to`
+  ORDER BY `open_case_count` DESC, `assigned_to` ASC
+
+RESULT:
+  | assigned_to      | open_case_count |
+  | ---------------- | --------------- |
+  | collections-team | 2               |
+
+There are 2 open collection cases assigned to collections-team. These are the exact rows
+the Databricks App wrote back into Lakebase (public.collection_cases); Genie reads them
+live from Lakebase through the table's Unity Catalog registration — closing the loop from
+app write-back to natural-language query with no copy.

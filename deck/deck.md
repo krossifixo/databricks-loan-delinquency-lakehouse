@@ -25,9 +25,9 @@ Raw data → decision, on a single platform:
 1. **Lakeflow** ingests raw loan + payment data (bronze → silver with data-quality rules).
 2. **Unity Catalog** governs it (comments, governed tag policy, grants, lineage).
 3. **ML + GenAI** scores every current loan and writes a plain-language briefing.
-4. **Lakebase** serves the scored queue for low-latency operational access.
-5. **Genie** lets risk/collections ask questions in plain English.
-6. **A Databricks App** puts the ranked queue, the AI briefing, and case actions in front of the business.
+4. **Lakebase** serves the scored queue, the briefing, and the operational cases from serverless Postgres (all three also queryable in Unity Catalog).
+5. **Genie** lets risk/collections ask questions in plain English, including over the live collection cases.
+6. **A Lakebase-native Databricks App** puts the ranked queue, the AI briefing, an embedded Genie assistant, and case actions in front of the business, writing cases straight back to Lakebase.
 
 ---
 
@@ -58,8 +58,8 @@ Focus the fixed collections capacity on the model's top slice instead of spreadi
 ## 7. Value for the domain owner (Collections & Risk Ops lead)
 - **A ranked daily queue** instead of a flat list — work the riskiest dollars first.
 - **An AI briefing** that explains the queue and recommends an action in plain language.
-- **Self-serve answers** via Genie ("which FICO band is rolling fastest?") with no SQL.
-- **Case workflow built in**: open and assign a case from the same screen; it is written back operationally.
+- **Self-serve answers** via an embedded Genie assistant ("which FICO band is rolling fastest?", "how many open cases per team?") with no SQL and without leaving the cockpit.
+- **Case workflow built in**: open and assign a case from the same screen; it is written back operationally to Lakebase and is immediately queryable in Genie and Unity Catalog.
 
 ---
 

@@ -6,9 +6,16 @@ Three tables; the queue is a native UC synced table, the app reads+writes Lakeba
 ## Tables + row counts
   serving.loan_risk_scored_synced  — 5000 rows  [UC synced table (queue)]
   public.at_risk_summary  — 1 rows  [GenAI briefing]
-  public.collection_cases  — 0 rows  [app write-back]
+  public.collection_cases  — 2 rows  [app write-back; written live by the Databricks App SP]
 
 ## App service principal grants (least privilege)
    public.at_risk_summary -> SELECT
    public.collection_cases -> INSERT,SELECT
    serving.loan_risk_scored_synced -> SELECT
+
+## Queryable from Databricks (Unity Catalog)
+All three Lakebase tables are registered under UC catalog `loan_delinquency_pg` (the synced
+table auto-registers; the two Postgres tables were registered once with
+`databricks database create-database-table`, no data copy). Verified live from a SQL warehouse:
+   SELECT * FROM loan_delinquency_pg.public.collection_cases ORDER BY created_at DESC;
+   -> 2 rows (LN003219, LN004555; both High; assigned collections-team) — the exact rows the app wrote.
