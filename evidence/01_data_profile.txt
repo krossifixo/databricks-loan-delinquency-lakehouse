@@ -1,0 +1,17 @@
+RAW DATA PROFILE
+============================================================
+loans rows:    5000  columns: ['loan_id', 'origination_date', 'product_type', 'principal_amount', 'apr', 'term_months', 'monthly_payment', 'fico_band', 'borrower_monthly_income', 'dti_ratio', 'ltv_ratio', 'state']
+payments rows: 60000  columns: ['loan_id', 'as_of_month', 'scheduled_payment', 'actual_payment', 'outstanding_balance', 'days_past_due', 'delinquency_bucket']
+
+FICO band distribution:
+  <580       527   10.5%
+  580-619    412    8.2%
+  620-659    771   15.4%
+  660-699    918   18.4%
+  700-739    888   17.8%
+  740-779    810   16.2%
+  780+       674   13.5%
+Product mix: {'new_auto': 1764, 'refi_auto': 745, 'used_auto': 2491}
+Payment snapshot delinquency buckets: {'current': 56224, '30dpd': 2244, '60dpd': 902, '90dpd': 393, '120dpd': 237}
+
+Loans ever 30+DPD: 1474/5000 = 29.5%  (target base rate)

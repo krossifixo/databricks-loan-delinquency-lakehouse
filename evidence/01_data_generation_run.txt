@@ -1,0 +1,3 @@
+loans=5000 payments=60000
+loans that hit 30+DPD at any point: 29.5%
+wrote /Users/mark.ativie/loan-delinquency-journey/data/raw/loans.csv and /Users/mark.ativie/loan-delinquency-journey/data/raw/payments.csv
