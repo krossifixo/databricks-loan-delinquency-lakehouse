@@ -28,7 +28,6 @@ genie/       Genie space definition + example question/SQL/result transcripts
 app/         Databricks App (collections cockpit)
 evidence/    READABLE-AS-TEXT execution evidence (run logs, query results, metrics)
 deck/        business presentation (outcome-led, KPI-quantified)
-RUNBOOK.md   operational runbook: service glossary, architecture, demo script, recreate steps
 ```
 
 ## Execution evidence
