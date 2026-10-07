@@ -2,8 +2,6 @@
 
 **What this is:** an end-to-end Databricks data journey that predicts which currently-current auto loans will roll 30+ days past due next cycle, and surfaces a ranked collections queue to a business app. Everything below is synthetic data; no real customer data.
 
-**Build conversation ID (Claude Code session):** `cb723977-710b-4540-9751-22f0655a87f3`
-
 **Repo:** https://github.com/krossifixo/databricks-loan-delinquency-lakehouse
 **App:** https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
 
