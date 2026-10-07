@@ -1,78 +1,78 @@
 # Catch Delinquency Before It Costs You
 ### Early intervention for auto lending, on one governed lakehouse
-Presenter: Solutions Architect · Audience: Chief Risk/Lending Officer (sponsor) + Collections & Risk Ops lead (owner)
+Audience: Chief Risk Officer (sponsor) and Collections & Risk Ops lead (owner)
+
+*(Plain-language business deck. Built on the Databricks Executive template.)*
 
 ---
 
-## 1. The business outcome (lead with this)
-**Stop losing money to loans that roll from current to charge-off while collections is still reacting after the fact.**
-
-We predict which currently-current loans will roll 30+ days past due **next cycle**, and hand collections a ranked daily queue so they intervene *before* the roll. The result the business feels: **lower net charge-offs and a more efficient collections team**, with no change to how loans are booked.
-
----
-
-## 2. The problem, in the buyer's terms
-- Collections today is **reactive**: a loan is worked only after it is already delinquent, when cure is harder and costlier.
-- Capacity is **finite**: the team can only call so many borrowers a month, and today that effort is spread without prioritization.
-- The cost shows up as **early-stage roll rate → roll-to-charge-off → net charge-offs ($)** — the KPIs the CRO reports and the Collections lead owns.
-
-On this synthetic 5,000-loan book (~$134.6M outstanding), **3.2% of current loans roll to 30+ DPD each cycle** — the leak we are closing.
+## 1. The business outcome
+- We flag the current borrowers most likely to miss a payment next month, and hand collections a ranked call list so they reach out before the account goes late.
+- What you feel: fewer accounts charged off as losses, and a collections team spending its time where it pays off.
+- Nothing changes in how you approve or book loans.
 
 ---
 
-## 3. What we built — one integrated journey, not six silos
-Raw data → decision, on a single platform:
-1. **Lakeflow** ingests raw loan + payment data (bronze → silver with data-quality rules).
-2. **Unity Catalog** governs it (comments, governed tag policy, grants, lineage).
-3. **ML + GenAI** scores every current loan and writes a plain-language briefing.
-4. **Lakebase** serves the scored queue, the briefing, and the operational cases from serverless Postgres (all three also queryable in Unity Catalog).
-5. **Genie** lets risk/collections ask questions in plain English, including over the live collection cases.
-6. **A Lakebase-native Databricks App** puts the ranked queue, the AI briefing, an embedded Genie assistant, and case actions in front of the business, writing cases straight back to Lakebase.
+## 2. The problem, in your terms
+- Collections only works an account after it is already late, when it is harder and more expensive to bring the borrower current.
+- The team can only make so many calls a month, and today that effort is spread evenly instead of aimed at the riskiest accounts.
+- The damage shows up as more accounts slipping from on-time to late, more of those going all the way to write-off, and higher loss totals, the numbers your risk leaders report every quarter.
+- On this sample book of 5,000 loans (about $134.6M owed), roughly 3 in every 100 on-time borrowers fall a month behind each cycle. That is the leak we close.
 
 ---
 
-## 4. Proof it works (from the actual build)
-- Model: next-month 30+ DPD classifier, registered in Unity Catalog.
-- **ROC AUC 0.74**; risk ranks monotonically with FICO (0.5% → 11.2%).
-- **3.7× lift in the top 5%**: the model's highest-risk slice is **~3.7× more likely** to actually roll than the average loan — so the same collections hour catches far more future delinquencies.
-- Today's queue: **153 High-risk loans, $4.4M exposure**, surfaced automatically with an AI briefing and recommended action.
+## 3. One connected system, not six disconnected tools
+- Raw loan and payment files are automatically cleaned and quality-checked (Lakeflow).
+- Every table is governed in one place, with clear ownership, access control, and a full audit trail (Unity Catalog).
+- A model scores each current borrower's risk, and plain-language notes explain the day's list (machine learning and generative AI).
+- The scored call list and case notes live in a fast operational database the app reads and writes instantly (Lakebase).
+- Anyone can ask questions in plain English, with no spreadsheets or code (Genie).
+- It all comes together in one collections web app: the ranked list, the daily briefing, a built-in question assistant, and one-click case creation.
 
 ---
 
-## 5. Quantified impact (the KPIs the buyer tracks)
-Focus the fixed collections capacity on the model's top slice instead of spreading it:
-- **Collections hit rate (precision of the worked queue): 11.8% vs 3.2% baseline** — ~3.7× more productive contacts.
-- **Early-stage roll rate**: intervene on the 153 High-risk loans each cycle rather than waiting.
-- **Illustrative loss avoided** (assumptions the customer validates): if early outreach cures just **25%** of the $4.4M High-risk exposure that would otherwise roll, at a **~55% loss-given-default** on charge-off, that is **~$0.6M in net charge-offs avoided per cycle** on this book — scaling with portfolio size.
-- **No new cost to book loans**: this runs on the data you already have.
+## 4. Does it actually work? Yes
+- The model reliably separates borrowers who will fall behind from those who will not, ranking the right one as higher risk about 3 times out of 4.
+- Risk lines up with credit scores exactly as you would expect: the weakest-credit borrowers are more than 20 times likelier to fall behind than the strongest (about 11% versus 0.5%).
+- Focus on the riskiest 5% the model flags and you reach borrowers about 3.7 times likelier to actually fall behind than a typical borrower, so each call does far more work.
+- Today's list: 153 high-risk loans worth $4.4M, each with a plain-language briefing and a recommended next step.
 
 ---
 
-## 6. Value for the executive sponsor (CRO / Chief Lending Officer)
-- **Lower net charge-offs and provisioning** by shifting collections from reactive to predictive.
-- **One governed platform** from raw data to app: auditable lineage, governed tag policies, and access control satisfy risk and audit.
-- **Scales and compounds**: the same pattern extends to pricing, line management, and recovery, on infrastructure you already run.
+## 5. What it is worth, in your numbers
+- Your call list hits the mark about 11.8% of the time, versus 3.2% working accounts at random, roughly 3.7 times more productive outreach.
+- Each cycle the team works the 153 highest-risk loans first, instead of waiting for them to go late.
+- An illustration to validate with your own data: if early outreach saves just a quarter of the $4.4M at-risk balance, and you would otherwise recover a little under half of a written-off loan, that is roughly $0.6M in losses avoided every cycle, growing with the size of your book.
+- No added cost to approve or book loans. This runs on data you already have.
 
 ---
 
-## 7. Value for the domain owner (Collections & Risk Ops lead)
-- **A ranked daily queue** instead of a flat list — work the riskiest dollars first.
-- **An AI briefing** that explains the queue and recommends an action in plain language.
-- **Self-serve answers** via an embedded Genie assistant ("which FICO band is rolling fastest?", "how many open cases per team?") with no SQL and without leaving the cockpit.
-- **Case workflow built in**: open and assign a case from the same screen; it is written back operationally to Lakebase and is immediately queryable in Genie and Unity Catalog.
+## 6. Why it matters to the Chief Risk Officer
+- Fewer losses and lower reserves by moving collections from reacting to predicting.
+- One governed system from raw data to finished app, with the audit trail, access controls, and ownership your risk and audit teams require.
+- The same approach extends to pricing, credit-line decisions, and recovery, on tools you already run.
 
 ---
 
-## 8. Why Databricks (why integrated matters)
-- The hand-offs between ingest, governance, ML, serving, NL, and the app are **the usual failure points**. Here they are one platform, one security model, one copy of governed data.
-- From a **raw file to a business decision** with no data movement to bolt-on tools — faster to value and cheaper to run.
+## 7. Why it matters to the collections lead
+- A ranked daily call list instead of a flat spreadsheet, so the team works the riskiest dollars first.
+- A plain-language briefing that explains the day's list and suggests the next action.
+- A built-in assistant that answers questions in plain English, right inside the app, with no switching tools and no code.
+- Case handling built in: open and assign a case in one click, saved instantly and available to everyone who needs it.
+
+---
+
+## 8. Why Databricks
+- The hand-offs between data prep, governance, modeling, serving, and the app are where most projects break. Here they are one connected system.
+- One platform, one set of security rules, one trusted copy of the data.
+- From a raw file to a business decision with no copying data between bolt-on tools, faster to launch and cheaper to run.
 
 ---
 
 ## 9. Next steps
-1. Point this at a **real (scrubbed) book** and validate the lift on your charge-off history.
-2. Agree the **intervention playbook** (who gets called, what offer) for the High tier.
-3. Pilot with the collections team for one cycle; measure roll-rate and hit-rate deltas.
-4. Expand the governed lakehouse pattern to the next risk use case.
+- Run the model against your own anonymized history and confirm the results on your real write-offs.
+- Agree who gets contacted, and with what offer, for the highest-risk tier.
+- Pilot with the collections team for one cycle, and measure the drop in accounts going late and the gain in successful outreach.
+- Extend the same approach to the next risk problem.
 
-*All figures above are from a synthetic dataset built for this prototype; dollar impact is illustrative and to be validated against the customer's actuals.*
+*All figures here come from a synthetic sample built for this prototype; the dollar impact is illustrative and should be validated against your actuals.*
