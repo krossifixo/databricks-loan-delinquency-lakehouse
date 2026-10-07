@@ -78,8 +78,8 @@ with st.form("case"):
     if submitted and loan:
         exec_sql(f"""CREATE TABLE IF NOT EXISTS {CASES}
           (case_id STRING, loan_id STRING, risk_tier STRING, assigned_to STRING, status STRING, created_at TIMESTAMP)""")
-        exec_sql(f"""INSERT INTO {CASES} VALUES
-          (uuid(), '{loan}', '{tier}', '{owner}', 'open', current_timestamp())""")
+        exec_sql(f"""INSERT INTO {CASES} SELECT
+          uuid(), '{loan}', '{tier}', '{owner}', 'open', current_timestamp()""")
         st.success(f"Case opened for {loan}, assigned to {owner}.")
 
 # --- Recent cases ---
