@@ -1,0 +1,83 @@
+GENIE — NATURAL-LANGUAGE QUERY TRANSCRIPTS (EVIDENCE)
+space: Loan Delinquency Risk — Collections Genie (01f1c272286c1c379ae5aa850af96c97)
+tables: delinquency_training, loan_risk_scored, loans_silver
+============================================================
+
+QUESTION: Which FICO band has the highest average target_delinquent_next in delinquency_training? Return fico_band and the rate.
+----------------------------------------
+
+SQL executed:
+  SELECT
+    `fico_band`,
+    ROUND(AVG(`target_delinquent_next`), 4) AS avg_target_delinquent_next
+  FROM `serverless_stable_fslt65_catalog`.`loan_delinquency`.`delinquency_training`
+  GROUP BY `fico_band`
+  ORDER BY avg_target_delinquent_next DESC
+## Highest Average Delinquency Rate by FICO Band
+
+The **<580** FICO band has the highest average `target_delinquent_next` rate at **0.1119 (≈11.2%)** — roughly double the next-highest band. [Query Result](https://fevm-serverless-stable-fslt65.cloud.databricks.com/one/chat/threads/340bb7ede92144e69802cc8bc6dcd8a8?o=7474658995900491#embed-query_0a13aa)
+
+Here is the full breakdown across all FICO bands:
+
+| fico_band | avg_target_delinquent_next |
+| --- | --- |
+| <580 | 0.1119 |
+| 580-619 | 0.0632 |
+| 620-659 | 0.0451 |
+| 660-699 | 0.0258 |
+| 700-739 | 0.0167 |
+| 740-779 | 0.0082 |
+| 780+ | 0.0052 |
+
+
+The pattern is monotonically decreasing: as FICO scores improve, the predicted next-month delinquency rate drops sharply — from ~11.2% for borrowers below 580 down to just ~0.5% for those at 780+. [serverless_stable_fslt65_catalog.loan_delinquency.delinquency_training](https://fevm-serverless-stable-fslt65.cloud.databricks.com/explore/data/serverless_stable_fslt65_catalog/loan_delinquency/delinquency_training?isDbOne=true&utm_source=one-chat&o=7474658995900491)
+
+
+QUESTION: In loan_risk_scored, list the top 5 loans by risk_score with loan_id, fico_band, risk_score and risk_tier.
+----------------------------------------
+
+SQL executed:
+  SELECT
+    `loan_id`,
+    `fico_band`,
+    `risk_score`,
+    `risk_tier`
+  FROM `serverless_stable_fslt65_catalog`.`loan_delinquency`.`loan_risk_scored`
+  ORDER BY `risk_score` DESC
+  LIMIT 5
+## Top 5 Loans by Risk Score
+
+All five highest-scoring loans fall into the **High** risk tier, with risk scores ranging from **0.60 to 0.94**. [Query Result](https://fevm-serverless-stable-fslt65.cloud.databricks.com/one/chat/threads/75cb73093cc740de8242c330f7fe08f7?o=7474658995900491#embed-query_db6b45)
+
+| loan_id | fico_band | risk_score | risk_tier |
+| --- | --- | --- | --- |
+| LN004555 | 780+ | 0.9378 | High |
+| LN002731 | 700-739 | 0.866 | High |
+| LN004702 | 620-659 | 0.7209 | High |
+| LN003287 | <580 | 0.6215 | High |
+| LN001795 | <580 | 0.6012 | High |
+
+
+**Key observations:**
+
+- **LN004555** carries the highest risk score (**0.9378**) despite being in the **780+** FICO band — suggesting that factors beyond credit score (e.g., DTI ratio, LTV, payment burden, or prior missed payments) are driving its elevated risk. [serverless_stable_fslt65_catalog.loan_delinquency.loan_risk_scored](https://fevm-serverless-stable-fslt65.cloud.databricks.com/explore/data/serverless_stable_fslt65_catalog/loan_delinquency/loan_risk_scored?isDbOne=true&utm_source=one-chat&o=7474658995900491)
+- Two of the top 5 loans (**LN003287** and **LN001795**) are in the **\<580** FICO band, which aligns more intuitively with high risk.
+- The spread across FICO bands (780+, 700–739, 620–659, \<580) indicates the risk model captures multidimensional risk beyond FICO alone.
+
+
+QUESTION: What is the total outstanding_balance for High risk loans in loan_risk_scored?
+----------------------------------------
+
+SQL executed:
+  SELECT
+    ROUND(SUM(`outstanding_balance`), 2) AS total_outstanding_balance
+  FROM `serverless_stable_fslt65_catalog`.`loan_delinquency`.`loan_risk_scored`
+  WHERE `risk_tier` = 'High'
+## Total Outstanding Balance for High Risk Loans
+
+The total outstanding balance for **High** risk tier loans in `loan_risk_scored` is **$4,393,756.61**. [Query Result](https://fevm-serverless-stable-fslt65.cloud.databricks.com/one/chat/threads/a8d66f6c03ce43b08a8b06c6e825302e?o=7474658995900491#embed-query_75f5e3) [serverless_stable_fslt65_catalog.loan_delinquency.loan_risk_scored](https://fevm-serverless-stable-fslt65.cloud.databricks.com/explore/data/serverless_stable_fslt65_catalog/loan_delinquency/loan_risk_scored?isDbOne=true&utm_source=one-chat&o=7474658995900491)
+
+| total_outstanding_balance |
+| --- |
+| 4393756.61 |
+

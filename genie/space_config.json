@@ -1,0 +1,21 @@
+{
+  "title": "Loan Delinquency Risk — Collections Genie",
+  "space_id": "01f1c272286c1c379ae5aa850af96c97",
+  "warehouse_id": "dd8909b1ec28c7ce",
+  "serialized_space": {
+    "version": 2,
+    "data_sources": {
+      "tables": [
+        {"identifier": "serverless_stable_fslt65_catalog.loan_delinquency.delinquency_training"},
+        {"identifier": "serverless_stable_fslt65_catalog.loan_delinquency.loan_risk_scored"},
+        {"identifier": "serverless_stable_fslt65_catalog.loan_delinquency.loans_silver"}
+      ]
+    }
+  },
+  "example_questions": [
+    "How many loans are in each risk tier and what is the total outstanding balance per tier?",
+    "Which FICO band has the highest delinquency roll rate?",
+    "List the top 5 loans by risk score.",
+    "What is the total outstanding balance for High risk loans?"
+  ]
+}
