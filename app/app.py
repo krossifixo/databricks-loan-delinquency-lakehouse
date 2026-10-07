@@ -4,7 +4,7 @@ A Databricks App that reads the ML-scored at-risk queue and GenAI briefing from,
 writes collection cases to, the Lakebase operational database. The app authenticates as
 its own service principal and mints a short-lived Lakebase credential at runtime.
 """
-import os, uuid
+import os, uuid, time
 import streamlit as st
 import pandas as pd
 import psycopg2
@@ -42,6 +42,44 @@ def write(sql, params):
     with connect() as c, c.cursor() as cur:
         cur.execute(sql, params); c.commit()
 
+def genie_ask(question):
+    """Ask the Genie space (Conversation API) and return (text, sql, dataframe)."""
+    sid = GENIE_SPACE
+    conv = st.session_state.get("genie_conv")
+    if conv:
+        r = w.api_client.do("POST", f"/api/2.0/genie/spaces/{sid}/conversations/{conv}/messages",
+                            body={"content": question})
+        msg = r.get("message_id") or r.get("id")
+    else:
+        r = w.api_client.do("POST", f"/api/2.0/genie/spaces/{sid}/start-conversation",
+                            body={"content": question})
+        conv = r.get("conversation_id"); msg = r.get("message_id")
+        st.session_state["genie_conv"] = conv
+    status = None
+    for _ in range(45):
+        m = w.api_client.do("GET", f"/api/2.0/genie/spaces/{sid}/conversations/{conv}/messages/{msg}")
+        status = m.get("status")
+        if status in ("COMPLETED", "FAILED", "CANCELLED"):
+            break
+        time.sleep(2)
+    text, sql, df = None, None, None
+    for a in (m.get("attachments") or []):
+        if a.get("text", {}).get("content"):
+            text = a["text"]["content"]
+        if "query" in a:
+            sql = a["query"].get("query") or a["query"].get("description")
+            aid = a.get("attachment_id")
+            try:
+                qr = w.api_client.do("GET", f"/api/2.0/genie/spaces/{sid}/conversations/{conv}/messages/{msg}/attachments/{aid}/query-result")
+                sr = qr["statement_response"]; res = sr.get("result", {})
+                cols = [c["name"] for c in sr["manifest"]["schema"]["columns"]]
+                df = pd.DataFrame(res.get("data_array", []), columns=cols)
+            except Exception:
+                pass
+    if status == "FAILED" and not text:
+        text = "Genie could not answer that one. Try rephrasing."
+    return text or "(no answer returned)", sql, df
+
 st.title("Collections Cockpit")
 st.caption("Early delinquency intervention for auto lending — rank today's current loans by their risk of rolling 30+ DPD next cycle. Served from Lakebase.")
 
@@ -66,7 +104,40 @@ try:
 except Exception as e:
     st.caption(f"(briefing unavailable: {e})")
 
-st.link_button("Ask the data in natural language (Genie)", f"https://{HOST}/genie/rooms/{GENIE_SPACE}")
+st.link_button("Open the full Genie space", f"https://{HOST}/genie/rooms/{GENIE_SPACE}")
+
+# --- In-app Genie chatbot ---
+st.subheader("Ask Genie (in-app)")
+st.caption("Ask about loans, delinquency drivers, or open cases in plain English — powered by the Genie space, no need to leave the app.")
+if "genie_hist" not in st.session_state:
+    st.session_state.genie_hist = []
+SAMPLES = [
+    "How many loans are in each risk tier?",
+    "Which FICO band has the highest delinquency rate?",
+    "How many open collection cases are there, grouped by assigned_to?",
+    "List the top 5 loans by risk score.",
+]
+scols = st.columns(len(SAMPLES))
+clicked = None
+for i, s in enumerate(SAMPLES):
+    if scols[i].button(s, key=f"gq{i}"):
+        clicked = s
+for role, content, sql, df in st.session_state.genie_hist:
+    with st.chat_message(role):
+        st.markdown(content)
+        if sql:
+            with st.expander("SQL Genie ran"):
+                st.code(sql, language="sql")
+        if df is not None and len(df):
+            st.dataframe(df, use_container_width=True, hide_index=True)
+typed = st.chat_input("Ask Genie a question about the portfolio...")
+prompt = typed or clicked
+if prompt:
+    st.session_state.genie_hist.append(("user", prompt, None, None))
+    with st.spinner("Genie is thinking..."):
+        text, sql, df = genie_ask(prompt)
+    st.session_state.genie_hist.append(("assistant", text, sql, df))
+    st.rerun()
 
 # --- At-risk queue ---
 st.subheader("At-risk queue")
