@@ -6,6 +6,7 @@
     "version": 2,
     "data_sources": {
       "tables": [
+        {"identifier": "loan_delinquency_pg.public.collection_cases"},
         {"identifier": "serverless_stable_fslt65_catalog.loan_delinquency.delinquency_training"},
         {"identifier": "serverless_stable_fslt65_catalog.loan_delinquency.loan_risk_scored"},
         {"identifier": "serverless_stable_fslt65_catalog.loan_delinquency.loans_silver"}
@@ -13,9 +14,9 @@
     }
   },
   "example_questions": [
-    "How many loans are in each risk tier and what is the total outstanding balance per tier?",
+    "How many loans are in each risk tier and the total outstanding balance per tier?",
     "Which FICO band has the highest delinquency roll rate?",
     "List the top 5 loans by risk score.",
-    "What is the total outstanding balance for High risk loans?"
+    "How many open collection cases are there, grouped by assigned_to?"
   ]
 }
