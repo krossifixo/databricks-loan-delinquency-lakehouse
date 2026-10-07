@@ -25,9 +25,12 @@ st.set_page_config(page_title="Collections Cockpit", layout="wide")
 w = WorkspaceClient()
 
 def connect():
-    cred = w.database.generate_database_credential(request_id=str(uuid.uuid4()), instance_names=[INSTANCE])
+    # version-independent: call the Lakebase credential REST endpoint directly
+    resp = w.api_client.do("POST", "/api/2.0/database/credentials",
+                           body={"request_id": str(uuid.uuid4()), "instance_names": [INSTANCE]})
+    token = resp["token"]
     return psycopg2.connect(host=PGHOST, port=5432, dbname=PGDB, user=PGUSER,
-                            password=cred.token, sslmode="require")
+                            password=token, sslmode="require")
 
 def q(sql, params=None):
     with connect() as c, c.cursor() as cur:
