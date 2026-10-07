@@ -36,5 +36,11 @@ cur.execute("INSERT INTO public.at_risk_summary VALUES (1,%s)", (summary,))
 cur.execute("""CREATE TABLE IF NOT EXISTS public.collection_cases(
   case_id serial PRIMARY KEY, loan_id text, risk_tier text, status text DEFAULT 'open',
   assigned_to text, created_at timestamptz DEFAULT now());""")
+
+# App service-principal least-privilege grants (reproducible); serial PK needs sequence USAGE
+SP="a2c59ebf-343f-424b-9604-0f15a8e1ec33"
+cur.execute(f'GRANT SELECT ON public.at_risk_summary TO "{SP}"')
+cur.execute(f'GRANT SELECT, INSERT ON public.collection_cases TO "{SP}"')
+cur.execute(f'GRANT USAGE, SELECT ON SEQUENCE public.collection_cases_case_id_seq TO "{SP}"')
 print("Lakebase ready: public.at_risk_summary (briefing), public.collection_cases (write-back); queue served by serving.loan_risk_scored_synced")
 cur.close(); conn.close()
