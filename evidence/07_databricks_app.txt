@@ -1,19 +1,19 @@
-DATABRICKS APP — EVIDENCE
+DATABRICKS APP — EVIDENCE (Lakebase-native)
 ============================================================
 App: loan-collections-cockpit (Streamlit)
 URL: https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
-Deploy state: SUCCEEDED — 'App started successfully'
-SP: a2c59ebf-343f-424b-9604-0f15a8e1ec33 (granted USE CATALOG/SCHEMA + SELECT + MODIFY on cases; warehouse CAN_USE)
+compute: ACTIVE | app: RUNNING - App has status: App is running
+SP: a2c59ebf-343f-424b-9604-0f15a8e1ec33
 
-## What the app surfaces (reads the governed/served tables via the warehouse):
- - KPIs: loans scored, high-risk count, high-risk exposure, avg risk score
- - AI briefing (at_risk_summary, GenAI)
- - At-risk queue (loan_risk_scored, filter by tier)
- - Open-case write-back -> app_collection_cases
- - Genie link (space 01f1c272286c1c379ae5aa850af96c97)
+## How it works
+ - Authenticates as its service principal; mints a Lakebase credential at runtime (databricks-sdk).
+ - Reads at-risk queue: serving.loan_risk_scored_synced (UC synced table)
+ - Reads GenAI briefing: public.at_risk_summary
+ - Writes case actions: public.collection_cases (INSERT)
+ - Genie link for NL questions
 
-## Underlying data the app serves (verified via warehouse):
-risk_tier | loans | exposure
-Low | 4004 | 1.06754816E8
-Medium | 843 | 2.3459266E7
-High | 153 | 4393757.0
+## Verified data path (app's exact queries, run against Lakebase)
+KPIs: 5000 loans, 153 High, $4,393,757 exposure
+queue top2: LN004555 (0.9378), LN002731 (0.8660)
+write-back: INSERT into collection_cases succeeded and read back
+SP grants: SELECT on synced queue + briefing; INSERT,SELECT on collection_cases

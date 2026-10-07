@@ -1,12 +1,15 @@
-# Collections Cockpit — Databricks App (Streamlit)
+# Collections Cockpit — Databricks App (Streamlit, Lakebase-native)
 
-Business-facing surface for the journey. Reads the ML-scored at-risk queue and the
-GenAI briefing from the governed serving tables (via the SQL warehouse using the app's
-service principal), links to the Genie space for NL questions, and writes collection-case
-actions back to `app_collection_cases`.
+Business-facing surface. Authenticates as its own **service principal**, mints a short-lived
+Lakebase credential at runtime, and talks directly to the Lakebase database:
+- reads the at-risk queue from `serving.loan_risk_scored_synced` (UC synced table),
+- reads the GenAI briefing from `public.at_risk_summary`,
+- writes collection-case actions to `public.collection_cases`.
+
+Links to the Genie space for natural-language questions.
 
 - URL: https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
-- Deploy: `databricks sync app <workspace_path>` then `databricks apps deploy loan-collections-cockpit --source-code-path <workspace_path>`
-- The app SP needs: USE CATALOG/SCHEMA + SELECT on the schema, MODIFY on app_collection_cases, CAN_USE on the warehouse.
+- SP: a2c59ebf-343f-424b-9604-0f15a8e1ec33 (Lakebase Postgres role + least-privilege table grants).
+- Deploy: `databricks sync app <ws_path>` then `databricks apps deploy loan-collections-cockpit --source-code-path <ws_path>`.
 
 See `../evidence/07_databricks_app.txt`.

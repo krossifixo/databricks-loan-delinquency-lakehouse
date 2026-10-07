@@ -1,4 +1,10 @@
 command: ["streamlit", "run", "app.py", "--server.port", "8000", "--server.address", "0.0.0.0"]
 env:
-  - name: DATABRICKS_WAREHOUSE_ID
-    value: "dd8909b1ec28c7ce"
+  - name: LAKEBASE_INSTANCE
+    value: "loan-delinquency-db"
+  - name: PGHOST
+    value: "ep-rapid-hill-d2oltmgm.database.us-east-1.cloud.databricks.com"
+  - name: PGUSER
+    value: "a2c59ebf-343f-424b-9604-0f15a8e1ec33"
+  - name: PGDATABASE
+    value: "databricks_postgres"

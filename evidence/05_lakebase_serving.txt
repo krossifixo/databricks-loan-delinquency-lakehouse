@@ -1,33 +1,14 @@
-LAKEBASE OPERATIONAL SERVING — EVIDENCE
-instance: loan-delinquency-db  host: ep-rapid-hill-d2oltmgm...us-east-1
+LAKEBASE OPERATIONAL SERVING — FINAL ARCHITECTURE (EVIDENCE)
+instance: loan-delinquency-db
 ============================================================
-rows served (loan_risk_scored): 5000
+Three tables; the queue is a native UC synced table, the app reads+writes Lakebase as its service principal.
 
-## Risk tier breakdown (served from Postgres)
-tier | loans | avg_score | exposure
-High | 153 | 0.2612 | 4393757
-Medium | 843 | 0.0798 | 23459266
-Low | 4004 | 0.0182 | 106754816
+## Tables + row counts
+  serving.loan_risk_scored_synced  — 5000 rows  [UC synced table (queue)]
+  public.at_risk_summary  — 1 rows  [GenAI briefing]
+  public.collection_cases  — 0 rows  [app write-back]
 
-## Top 5 at-risk (the app's default queue, served sub-second via idx_risk)
-loan_id | fico_band | risk_score | tier | prior_missed_3m
-LN004555 | 780+ | 0.9378 | High | 1
-LN002731 | 700-739 | 0.8660 | High | 0
-LN004702 | 620-659 | 0.7209 | High | 0
-LN003287 | <580 | 0.6215 | High | 0
-LN001795 | <580 | 0.6012 | High | 1
-
-## Indexes (operational serving performance)
- - idx_risk
- - idx_tier
- - loan_risk_scored_pkey
-
-## Operational tables present
- - at_risk_summary
- - loan_risk_scored
-
-## GenAI summary served to the app
-We have identified 153 high-risk auto loans with a total outstanding exposure of $4,393,757 that are likely to roll 30+ days past due next month, indicating a potential increase in delinquencies. The average model risk score of 0.261, average payment burden of 0.188, and average DTI of 0.536 suggest that these borrowers may be experiencing financial strain, making early intervention crucial. To mitigate potential losses, I recommend proactively contacting these high-risk borrowers via phone or email to offer assistance and explore possible alternatives, such as temporary payment deferments or refinancing options, to help them get back on track with their payments.
-
-## Operational write-path table for the app
- - collection_cases (case_id, loan_id, risk_tier, status, assigned_to, created_at) — the app writes case actions here
+## App service principal grants (least privilege)
+   public.at_risk_summary -> SELECT
+   public.collection_cases -> INSERT,SELECT
+   serving.loan_risk_scored_synced -> SELECT

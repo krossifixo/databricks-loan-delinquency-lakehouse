@@ -1,9 +1,19 @@
-# Lakebase operational serving
+# Lakebase operational serving (final architecture)
 
-Two serving paths into the Lakebase instance `loan-delinquency-db`:
+Instance `loan-delinquency-db`. Three tables:
 
-1. Direct write (`sync_to_lakebase.py`) -> `loan_risk_scored`, `at_risk_summary`, `collection_cases` in Postgres `public`. Evidence: `../evidence/05_lakebase_serving.txt`.
-2. Native UC synced table (`synced_table_spec.json`) -> `loan_delinquency_pg.serving.loan_risk_scored_synced`, SNAPSHOT-synced from Delta via the Lakebase database catalog. Evidence: `../evidence/05b_lakebase_synced_table.txt`.
+| Table | Role | Maintained by |
+|---|---|---|
+| `serving.loan_risk_scored_synced` | At-risk queue (scored loans) | Native UC **synced table** (SNAPSHOT from the Delta source) — `synced_table_spec.json` |
+| `public.at_risk_summary` | GenAI briefing (1 row) | `sync_to_lakebase.py` (pulled from UC each ML run) |
+| `public.collection_cases` | Operational case write-back | Created empty; the Databricks App INSERTs here |
 
-Recreate the synced table:
-`databricks database create-synced-database-table --json @synced_table_spec.json -p fevm-serverless-stable-fslt65`
+The Databricks App authenticates as its **service principal** (Postgres role created via
+`databricks postgres create-role`), reads the synced queue + briefing, and writes cases —
+all directly against Lakebase. Least-privilege grants: SELECT on the queue + briefing,
+INSERT/SELECT on collection_cases.
+
+Recreate the synced table: `databricks database create-synced-database-table --json @synced_table_spec.json -p fevm-serverless-stable-fslt65`
+Seed the other two tables: `python3 sync_to_lakebase.py`
+
+Evidence: `../evidence/05_lakebase_serving.txt`.
