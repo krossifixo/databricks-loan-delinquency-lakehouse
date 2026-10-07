@@ -1,0 +1,30 @@
+ML + GENAI — EVIDENCE
+============================================================
+## Registered model (Unity Catalog) + logged metrics
+version: 1 | run_id: c8ed0840eb10465fa4b0bfe71c582ef6
+  roc_auc               : 0.7433
+  pr_auc                : 0.0906
+  positive_rate         : 0.0318
+  precision_at_top5pct  : 0.1180
+  lift_at_top5pct       : 3.7113
+
+## Scored queue by risk tier (loan_risk_scored)
+risk_tier | loans | avg_score | exposure
+High | 153 | 0.2612 | 4393757.0
+Medium | 843 | 0.0798 | 2.3459266E7
+Low | 4004 | 0.0182 | 1.06754816E8
+
+## Top 8 highest-risk loans
+loan_id | fico_band | risk_score | risk_tier | burden | prior_missed_3m | balance
+LN004555 | 780+ | 0.9378 | High | 0.103 | 1 | 18135.0
+LN002731 | 700-739 | 0.866 | High | 0.066 | 0 | 24173.0
+LN004702 | 620-659 | 0.7209 | High | 0.057 | 0 | 7669.0
+LN003287 | <580 | 0.6215 | High | 0.024 | 0 | 7206.0
+LN001795 | <580 | 0.6012 | High | 0.212 | 1 | 40476.0
+LN003219 | <580 | 0.5787 | High | 0.18 | 2 | 35912.0
+LN003511 | <580 | 0.5783 | High | 0.306 | 1 | 35484.0
+LN004623 | <580 | 0.5637 | High | 0.249 | 2 | 41297.0
+
+## GenAI summary of the High-risk queue (at_risk_summary)
+summary
+We have identified 153 high-risk auto loans with a total outstanding exposure of $4,393,757 that are likely to roll 30+ days past due next month, indicating a potential increase in delinquencies. The average model risk score of 0.261, average payment burden of 0.188, and average DTI of 0.536 suggest that these borrowers may be experiencing financial strain, making early intervention crucial. To mitigate potential losses, I recommend proactively contacting these high-risk borrowers via phone or email to offer assistance and explore possible alternatives, such as temporary payment deferments or refinancing options, to help them get back on track with their payments.
