@@ -17,3 +17,14 @@ Recreate the synced table: `databricks database create-synced-database-table --j
 Seed the other two tables: `python3 sync_to_lakebase.py`
 
 Evidence: `../evidence/05_lakebase_serving.txt`.
+
+## Querying the Lakebase tables from Databricks (UC)
+The synced table auto-registers in UC. Tables created directly in Postgres must be registered once (no data copy — UC reads live from Lakebase):
+```
+databricks schemas create public loan_delinquency_pg -p fevm-serverless-stable-fslt65
+databricks database create-database-table loan_delinquency_pg.public.collection_cases \
+  --database-instance-name loan-delinquency-db --logical-database-name databricks_postgres -p fevm-serverless-stable-fslt65
+databricks database create-database-table loan_delinquency_pg.public.at_risk_summary \
+  --database-instance-name loan-delinquency-db --logical-database-name databricks_postgres -p fevm-serverless-stable-fslt65
+```
+Then query anywhere in Databricks, e.g. `SELECT * FROM loan_delinquency_pg.public.collection_cases ORDER BY created_at DESC;`
