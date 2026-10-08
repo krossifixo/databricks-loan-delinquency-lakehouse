@@ -21,7 +21,7 @@ Audience: Chief Risk Officer (sponsor) and Collections & Risk Ops lead (owner)
 
 ---
 
-## 3. One connected system, not six disconnected tools
+## 3. One connected system, not six tools
 - Raw loan and payment files are automatically cleaned and quality-checked (Lakeflow).
 - Every table is governed in one place, with clear ownership, access control, and a full audit trail (Unity Catalog).
 - A model scores each current borrower's risk, and plain-language notes explain the day's list (machine learning and generative AI).
