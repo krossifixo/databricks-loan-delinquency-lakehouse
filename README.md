@@ -28,7 +28,11 @@ genie/       Genie space definition + example question/SQL/result transcripts
 app/         Databricks App (collections cockpit)
 evidence/    READABLE-AS-TEXT execution evidence (run logs, query results, metrics)
 deck/        business presentation (outcome-led, KPI-quantified)
+BUILD.md     how it was built: workflow, AI-tooling decisions, and the reasoning behind the model/threshold/prompt choices
 ```
+
+## How it was built
+See **[BUILD.md](BUILD.md)** for the build narrative in my own voice: the stage-by-stage workflow, where the AI assistant (Claude Code + the Databricks AI Dev Kit) was the force multiplier, where I had to intervene and redirect it, and the trade-off reasoning behind the specific data, classifier, risk-tier, and GenAI-prompt choices.
 
 ## Execution evidence
 Per the submission rules, this repo commits **text** evidence that the build ran: data-generation run logs, Lakeflow pipeline run output, Unity Catalog query results, model metrics and sample scored output, Lakebase verification queries, and Genie question→SQL→result transcripts. See `evidence/`.
@@ -47,6 +51,7 @@ Built on Databricks (serverless), Unity Catalog catalog `serverless_stable_fslt6
 | Genie NL querying | `genie/space_config.json` | `evidence/06_genie_transcripts.txt` |
 | Databricks App | `app/app.py` | `evidence/07_databricks_app.txt` |
 
+- **Build narrative:** `BUILD.md` (workflow, AI-tooling decisions, and trade-off reasoning for the model/threshold/prompt choices)
 - **App:** https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
 - **Genie space:** Loan Delinquency Risk — Collections Genie (`01f1c272286c1c379ae5aa850af96c97`)
 - **Deck:** `deck/collections_cockpit_deck.pdf`
