@@ -49,5 +49,5 @@ Built on Databricks (serverless), Unity Catalog catalog `serverless_stable_fslt6
 
 - **App:** https://loan-collections-cockpit-7474658995900491.aws.databricksapps.com
 - **Genie space:** Loan Delinquency Risk — Collections Genie (`01f1c272286c1c379ae5aa850af96c97`)
-- **Deck:** `deck/collections_cockpit_deck.pdf` (+ editable Google Slides linked in `deck/README.md`)
+- **Deck:** `deck/collections_cockpit_deck.pdf`
 - All data synthetic; no real customer data.
