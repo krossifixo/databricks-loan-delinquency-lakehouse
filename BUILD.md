@@ -110,14 +110,3 @@ decision-oriented, and tied to the actual numbers. I used `databricks-meta-llama
 through `ai_query` so it is one governed SQL call with no extra infrastructure, and I added a
 deterministic fallback paragraph so the pipeline still produces a sensible briefing if the endpoint
 is unavailable. That fallback was a deliberate robustness choice, not an afterthought.
-
-## What I would build next
-
-The parts I would push next, in priority order: inject deliberate edge cases into the generator (a
-seasonal missed-payment spike, a segment where DTI misleads) so Genie and the briefing can surface
-a genuinely surprising insight; turn the aggregate briefing into a *per-loan* grounded action
-recommendation that references each loan's `prior_missed_3m` and `payment_burden`, and log those
-generations to an inference table for auditability; deepen the CRO story in the deck to the specific
-loss-provision and reserve metrics that role is measured on; and, now that the app has row-level
-write access through its service principal, add row-level security and column masking on sensitive
-borrower fields in Unity Catalog to finish the governance story for an audited lending use case.
