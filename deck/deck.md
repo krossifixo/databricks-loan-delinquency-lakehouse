@@ -48,9 +48,10 @@ Audience: Chief Risk Officer (sponsor) and Collections & Risk Ops lead (owner)
 ---
 
 ## 6. Why it matters to the Chief Risk Officer
-- Fewer losses and lower reserves by moving collections from reacting to predicting.
-- One governed system from raw data to finished app, with the audit trail, access controls, and ownership your risk and audit teams require.
-- The same approach extends to pricing, credit-line decisions, and recovery, on tools you already run.
+- You are measured on the net charge-off rate and the allowance for credit losses you must hold; catching rolls earlier reduces the losses flowing through that allowance, cycle after cycle.
+- Under CECL, reserves rest on reasonable and supportable forecasts of expected loss. A governed, auditable early-warning signal sharpens those forecasts at the loan level, with the lineage examiners expect.
+- Audit trail, access controls, and ownership are built in from raw data to app, so the system that drives collections also stands up to risk and audit review.
+- One platform to grow onto, not a point tool: the same governed data and models extend to underwriting and risk-based pricing, credit-line management, and recovery, compounding into a durable edge over lenders still stitching tools together.
 
 ---
 
